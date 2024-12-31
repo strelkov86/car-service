@@ -1,9 +1,9 @@
 ﻿using Serilog.Events;
-using Serilog.Sinks.Elasticsearch;
 using Serilog;
 using System;
 using System.Reflection;
 using Microsoft.Extensions.Hosting;
+using Serilog.Formatting.Json;
 
 namespace SibintekTask.Infrastructure.Logging
 {
@@ -19,7 +19,7 @@ namespace SibintekTask.Infrastructure.Logging
                 .Enrich.WithMachineName()
                 .Enrich.WithProperty("Environment", environmentName)
                 .WriteTo.Console()
-                .WriteTo.File(new ElasticsearchJsonFormatter(), "logs/applogs-.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(new JsonFormatter(), "logs/applogs-.txt", rollingInterval: RollingInterval.Day)
                 .WriteTo.Seq(seqUri)
                 .ReadFrom.Configuration(context.Configuration);
         }

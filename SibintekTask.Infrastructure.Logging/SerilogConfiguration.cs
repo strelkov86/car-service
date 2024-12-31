@@ -11,20 +11,16 @@ namespace SibintekTask.Infrastructure.Logging
     {
         public static void ConfigureSerilog(HostBuilderContext context, LoggerConfiguration loggerConfiguration)
         {
-            var elasticsearchUri = context.Configuration["ElasticConfiguration:Uri"];
+            var seqUri = context.Configuration["SeqConfiguration:Uri"];
             var environmentName = context.HostingEnvironment.EnvironmentName;
-            var assemblyName = Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-");
 
             loggerConfiguration
                 .Enrich.FromLogContext()
+                .Enrich.WithMachineName()
+                .Enrich.WithProperty("Environment", environmentName)
                 .WriteTo.Console()
                 .WriteTo.File(new ElasticsearchJsonFormatter(), "logs/applogs-.txt", rollingInterval: RollingInterval.Day)
-                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(elasticsearchUri))
-                {
-                    IndexFormat = $"{assemblyName}-{environmentName?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
-                    AutoRegisterTemplate = true
-                })
-                .Enrich.WithProperty("Environment", environmentName)
+                .WriteTo.Seq(seqUri)
                 .ReadFrom.Configuration(context.Configuration);
         }
     }

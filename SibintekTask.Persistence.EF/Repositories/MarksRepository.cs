@@ -57,10 +57,10 @@ namespace SibintekTask.Persistence.EF.Repositories
 
         public async Task<IEnumerable<Mark>> GetAll(CancellationToken token = default)
         {
-            //_logger.LogCritical("test log critical");
             await using var db = _dbContextFactory.CreateDbContext();
             try
             {
+                //_logger.LogCritical("test seq functional {TestMessage} {@Marks}", 42, db.Marks.ToList());
                 return await db.Marks.AsNoTracking().ToListAsync(token);
             }
             catch (Exception ex)

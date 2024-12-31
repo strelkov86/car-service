@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SibintekTask.API", "SibintekTask.API.csproj", "{81D4B5CB-8835-401B-937E-BC278C55013E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SibintekTask.Core", "..\SibintekTask.Core\SibintekTask.Core.csproj", "{DB93E358-EF02-4F04-970F-A5E1FAB32B20}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SibintekTask.Persistence.EF", "..\SibintekTask.Persistence.EF\SibintekTask.Persistence.EF.csproj", "{F0A541FF-BA66-43D1-8DBC-22FC7C548A7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SibintekTask.Application", "..\SibintekTask.Application\SibintekTask.Application.csproj", "{C74CB2DE-EB95-46C9-869D-3585CCEBD416}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SibintekTask.Infrastructure.Logging", "..\SibintekTask.Infrastructure.Logging\SibintekTask.Infrastructure.Logging.csproj", "{15995E47-7E81-4ED2-9078-D8D0BFA157C5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{81D4B5CB-8835-401B-937E-BC278C55013E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81D4B5CB-8835-401B-937E-BC278C55013E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81D4B5CB-8835-401B-937E-BC278C55013E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81D4B5CB-8835-401B-937E-BC278C55013E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB93E358-EF02-4F04-970F-A5E1FAB32B20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB93E358-EF02-4F04-970F-A5E1FAB32B20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB93E358-EF02-4F04-970F-A5E1FAB32B20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB93E358-EF02-4F04-970F-A5E1FAB32B20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0A541FF-BA66-43D1-8DBC-22FC7C548A7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0A541FF-BA66-43D1-8DBC-22FC7C548A7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0A541FF-BA66-43D1-8DBC-22FC7C548A7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0A541FF-BA66-43D1-8DBC-22FC7C548A7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C74CB2DE-EB95-46C9-869D-3585CCEBD416}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C74CB2DE-EB95-46C9-869D-3585CCEBD416}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C74CB2DE-EB95-46C9-869D-3585CCEBD416}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C74CB2DE-EB95-46C9-869D-3585CCEBD416}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15995E47-7E81-4ED2-9078-D8D0BFA157C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15995E47-7E81-4ED2-9078-D8D0BFA157C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15995E47-7E81-4ED2-9078-D8D0BFA157C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15995E47-7E81-4ED2-9078-D8D0BFA157C5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

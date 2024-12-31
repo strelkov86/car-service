@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.2.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.2.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SibintekTask.Application\SibintekTask.Application.csproj" />
+    <ProjectReference Include="..\SibintekTask.Core\SibintekTask.Core.csproj" />
+    <ProjectReference Include="..\SibintekTask.Infrastructure.Logging\SibintekTask.Infrastructure.Logging.csproj" />
+    <ProjectReference Include="..\SibintekTask.Persistence.EF\SibintekTask.Persistence.EF.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -154,14 +154,12 @@ namespace SibintekTask.Persistence.EF.Repositories
 
         private async Task LoadRepairReferences(Repair repair, CancellationToken token = default)
         {
-            var type = _context.Entry(repair).Reference(r => r.RepairType).LoadAsync(token);
-            var customer = _context.Entry(repair).Reference(r => r.Customer).LoadAsync(token);
-            var executor = _context.Entry(repair).Reference(r => r.Executor).LoadAsync(token);
+            await _context.Entry(repair).Reference(r => r.RepairType).LoadAsync(token);
+            await _context.Entry(repair).Reference(r => r.Customer).LoadAsync(token);
+            await _context.Entry(repair).Reference(r => r.Executor).LoadAsync(token);
 
             await _context.Entry(repair).Reference(r => r.Vehicle).LoadAsync(token);
-            var mark = _context.Entry(repair.Vehicle).Reference(v => v.Mark).LoadAsync(token);
-
-            await Task.WhenAll(type, customer, executor, mark);
+            await _context.Entry(repair.Vehicle).Reference(v => v.Mark).LoadAsync(token);
         }
     }
 }

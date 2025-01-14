@@ -58,8 +58,6 @@ namespace SibintekTask.API.Controllers
         {
             var (currentUserId, isManager) = GetUserInfo();
 
-            if (!IsAuthorized(id, currentUserId, isManager)) return Forbid();
-
             var report = await _reportsService.GetReportByVehicleId(id, startDate, endDate,
                 isManager ? null : currentUserId);
 

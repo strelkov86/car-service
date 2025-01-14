@@ -58,6 +58,7 @@ namespace SibintekTask.API.Controllers
         {
             var dto = new RepairDTO()
             {
+                Id = id,
                 RepairTypeId = request.RepairTypeId,
                 Cost = request.Cost,
                 AcceptedAt = request.AcceptedAt,
@@ -83,7 +84,7 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult> IssueRepair(int id)
         {
             var repair = await _repairsService.FinishRepair(id);
-            return Ok($"{repair.RepairType} для машины {repair.Vehicle.Mark} {repair.Vehicle.NumberPlate} завершен. Заказчик {repair.Customer} принял машину {repair.FinishedAt} от исполнителя {repair.Executor}");
+            return Ok($"{repair.RepairType.Name} для машины {repair.Vehicle.Mark.Name} ({repair.Vehicle.NumberPlate}) завершен. Заказчик {repair.Customer.Surname} принял машину {repair.FinishedAt} от исполнителя {repair.Executor.Surname}");
         }
     }
 }

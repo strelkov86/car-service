@@ -11,7 +11,8 @@ namespace SibintekTask.Infrastructure.Logging
     {
         public static void ConfigureSerilog(HostBuilderContext context, LoggerConfiguration loggerConfiguration)
         {
-            var seqUri = context.Configuration["SeqConfiguration:Uri"];
+            var seqHost = Environment.GetEnvironmentVariable("SEQ_HOST");
+            var seqUri = string.IsNullOrEmpty(seqHost) ? context.Configuration["SeqConfiguration:Uri"] : $"http://{seqHost}:5341";
             var environmentName = context.HostingEnvironment.EnvironmentName;
 
             loggerConfiguration

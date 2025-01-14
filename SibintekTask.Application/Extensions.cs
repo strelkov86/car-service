@@ -5,6 +5,7 @@ using SibintekTask.Application.Auth;
 using SibintekTask.Application.Interfaces;
 using SibintekTask.Application.Services;
 using SibintekTask.Persistence.EF;
+using System;
 
 namespace SibintekTask.Application
 {
@@ -12,8 +13,15 @@ namespace SibintekTask.Application
     {
         public static IServiceCollection AddPostgreSQL(this IServiceCollection services, IConfiguration configuration)
         {
+            var dbUser = Environment.GetEnvironmentVariable("POSTGRES_USER");
+            var dbPassword = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
+            var dbName = Environment.GetEnvironmentVariable("DATABASE_NAME");
+
+            var connectionString = dbUser == null && dbPassword == null && dbName == null
+                ? configuration.GetConnectionString("LocalPostgreSQL")
+                : $"Host=postgresql;Port=5432;Database={dbName};Username={dbUser};Password={dbPassword};";
             services.AddDbContext<SibintekDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("LocalPostgreSQL")));
+                options.UseNpgsql(connectionString));
 
             return services;
         }

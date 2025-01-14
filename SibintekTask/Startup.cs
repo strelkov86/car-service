@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using SibintekTask.API.Middlewares;
 using SibintekTask.Application;
 using SibintekTask.Application.Auth;
@@ -69,13 +68,13 @@ namespace SibintekTask.API
             app.UseGlobalRoutePrefix("/api/");
             app.UsePathBase(new PathString("/api"));
 
-            if (env.IsDevelopment())
-            {
+            //if (env.IsDevelopment())
+            //{
                 app.UseDeveloperExceptionPage();
 
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
+            //}
 
             app.UseMiddleware<GlobalExceptionHandler>();
 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using SibintekTask.Core.Exceptions;
 using SibintekTask.Core.Interfaces;
 using SibintekTask.Core.Models;
 using System;
@@ -12,113 +12,51 @@ namespace SibintekTask.Persistence.EF.Repositories
 {
     public class RepairTypesRepository : IRepairTypesRepository
     {
-        private readonly IDbContextFactory<SibintekDbContext> _dbContextFactory;
-        private readonly ILogger _logger;
+        private readonly SibintekDbContext _context;
 
-        public RepairTypesRepository(IDbContextFactory<SibintekDbContext> f, ILogger<RepairTypesRepository> l)
+        public RepairTypesRepository(SibintekDbContext c)
         {
-            _dbContextFactory = f;
-            _logger = l;
+            _context = c;
         }
 
         public async Task<RepairType> Create(RepairType type, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-            db.RepairTypes.Add(type);
+            _context.RepairTypes.Add(type);
 
-            try
-            {
-                await db.SaveChangesAsync(token);
-                return type;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            await _context.SaveChangesAsync(token);
+            return type;
         }
 
         public async Task<int> Delete(int id, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
+            var type = await _context.RepairTypes.FirstOrDefaultAsync(c => c.Id == id, token) ?? throw new NotFoundException<RepairType>(id);
 
-            try
-            {
-                var type = await db.RepairTypes.FirstOrDefaultAsync(c => c.Id == id, token);
-                if (type is null) return 0;
-
-                db.RepairTypes.Remove(type);
-                return await db.SaveChangesAsync(token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            _context.RepairTypes.Remove(type);
+            return await _context.SaveChangesAsync(token);
         }
 
         public async Task<IEnumerable<RepairType>> GetAll(CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-
-            try
-            {
-                return await db.RepairTypes.AsNoTracking().ToListAsync(token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            return await _context.RepairTypes.AsNoTracking().ToListAsync(token);
         }
 
         public async Task<RepairType?> GetById(int id, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-
-            try
-            {
-                return await db.RepairTypes.Where(c => c.Id == id).AsNoTracking().FirstOrDefaultAsync(token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            return await _context.RepairTypes.Where(c => c.Id == id).AsNoTracking().FirstOrDefaultAsync(token) ?? throw new NotFoundException<RepairType>(id);
         }
 
         public async Task<RepairType?> GetByName(string name, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-
-            try
-            {
-                return await db.RepairTypes.Where(c => c.Name == name).AsNoTracking().FirstOrDefaultAsync(token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            return await _context.RepairTypes.Where(c => c.Name == name).AsNoTracking().FirstOrDefaultAsync(token);
         }
 
         public async Task<RepairType?> Update(RepairType type, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
+            var old = await _context.RepairTypes.FirstOrDefaultAsync(c => c.Id == type.Id, token) ?? throw new NotFoundException<RepairType>(type.Id);
+            old.Name = type.Name;
 
-            try
-            {
-                var old = await db.RepairTypes.FirstOrDefaultAsync(c => c.Id == type.Id, token);
-                if (old is null) return null;
+            await _context.SaveChangesAsync(token);
 
-                old.Name = type.Name;
-                await db.SaveChangesAsync(token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
             return type;
         }
     }

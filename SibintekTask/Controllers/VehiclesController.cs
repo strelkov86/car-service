@@ -32,7 +32,6 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult> GetVehicleById(int id)
         {
             var vehicle = await _vehiclesService.GetById(id);
-            if (vehicle is null) return NotFound($"Машина {id} не найдена");
             var response = VehiclesHelper.PrepareVehicleResponse(vehicle);
             return Ok(new { Vehicle = response });
         }
@@ -51,7 +50,6 @@ namespace SibintekTask.API.Controllers
         {
             var vehicleDto = new VehicleDTO() { Id = id, NumberPlate = request.NumberPlate, MarkId = request.MarkId };
             var updated = await _vehiclesService.Update(vehicleDto);
-            if (updated is null) return NotFound($"Машина {id} не найдена");
             var response = VehiclesHelper.PrepareVehicleResponse(updated);
             return Ok(new { Updated = response });
         }
@@ -60,7 +58,6 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult> DeleteVehicle(int id)
         {
             var deleted = await _vehiclesService.Delete(id);
-            if (deleted == 0) return NotFound($"Машина {id} не найдена");
             return Ok(new { DeletedCount = deleted });
         }
     }

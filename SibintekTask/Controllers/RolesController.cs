@@ -30,7 +30,6 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult> GetRoleById(int id)
         {
             var role = await _rolesService.GetById(id);
-            if (role is null) return NotFound($"Роль {id} не найдена");
             return Ok(new { Role = role });
         }
 
@@ -47,7 +46,6 @@ namespace SibintekTask.API.Controllers
         {
             var roleDto = new RoleDTO() { Id = id, Name = request.Name };
             var updated = await _rolesService.Update(roleDto);
-            if (updated is null) return NotFound($"Роль {id} не найдена");
             return Ok(new { Updated = updated });
         }
 
@@ -55,7 +53,6 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult> DeleteRole(int id)
         {
             var deleted = await _rolesService.Delete(id);
-            if (deleted == 0) return NotFound($"Роль {id} не найдена");
             return Ok(new { DeletedCount = deleted });
         }
     }

@@ -32,7 +32,6 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult<RepairDTO>> GetRepairById(int id)
         {
             var repair = await _repairsService.GetById(id);
-            if (repair is null) return NotFound($"Ремонт {id} не найден");
             var response = RepairsHelper.PrepareRepairResponse(repair);
             return Ok(new { Repair = response });
         }
@@ -68,7 +67,6 @@ namespace SibintekTask.API.Controllers
                 ExecutorId = request.ExecutorId
             };
             var updated = await _repairsService.Update(dto);
-            if (updated is null) return NotFound($"Ремонт {id} не найден");
             var response = RepairsHelper.PrepareRepairResponse(updated);
             return Ok(new { Updated = response });
         }
@@ -78,7 +76,6 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult<int>> DeleteRepair(int id)
         {
             var deleted = await _repairsService.Delete(id);
-            if (deleted == 0) return NotFound($"Ремонт {id} не найден");
             return Ok(new { DeletedCount = deleted });
         }
 
@@ -86,7 +83,6 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult> IssueRepair(int id)
         {
             var repair = await _repairsService.FinishRepair(id);
-            if (repair is null) return NotFound($"Ремонт {id} не найден");
             return Ok($"{repair.RepairType} для машины {repair.Vehicle.Mark} {repair.Vehicle.NumberPlate} завершен. Заказчик {repair.Customer} принял машину {repair.FinishedAt} от исполнителя {repair.Executor}");
         }
     }

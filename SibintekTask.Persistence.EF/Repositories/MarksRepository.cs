@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using SibintekTask.Core.Exceptions;
 using SibintekTask.Core.Interfaces;
 using SibintekTask.Core.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -12,108 +11,48 @@ namespace SibintekTask.Persistence.EF.Repositories
 {
     public class MarksRepository : IMarksRepository
     {
-        private readonly IDbContextFactory<SibintekDbContext> _dbContextFactory;
-        private readonly ILogger _logger;
+        private readonly SibintekDbContext _context;
 
-        public MarksRepository(IDbContextFactory<SibintekDbContext> f, ILogger<MarksRepository> l)
+        public MarksRepository(SibintekDbContext c)
         {
-            _dbContextFactory = f;
-            _logger = l;
+            _context = c;
         }
 
         public async Task<Mark> Create(Mark mark, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-            try
-            {
-                db.Marks.Add(mark);
-                await db.SaveChangesAsync(token);
-                return mark;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            _context.Marks.Add(mark);
+            await _context.SaveChangesAsync(token);
+            return mark;
         }
 
         public async Task<int> Delete(int id, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-            try
-            {
-                var mark = await db.Marks.FirstOrDefaultAsync(c => c.Id == id, token);
-                if (mark is null) return 0;
-
-                db.Marks.Remove(mark);
-                return await db.SaveChangesAsync(token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            var mark = await _context.Marks.FirstOrDefaultAsync(c => c.Id == id, token) ?? throw new NotFoundException<Mark>(id);
+            _context.Marks.Remove(mark);
+            return await _context.SaveChangesAsync(token);
         }
 
         public async Task<IEnumerable<Mark>> GetAll(CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-            try
-            {
-                //_logger.LogCritical("test seq functional {TestMessage} {@Marks}", 42, db.Marks.ToList());
-                return await db.Marks.AsNoTracking().ToListAsync(token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            return await _context.Marks.AsNoTracking().ToListAsync(token);
         }
 
         public async Task<Mark?> GetById(int id, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-            try
-            {
-                return await db.Marks.Where(c => c.Id == id).AsNoTracking().FirstOrDefaultAsync(token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            return await _context.Marks.Where(c => c.Id == id).AsNoTracking().FirstOrDefaultAsync(token) ?? throw new NotFoundException<Mark>(id);
         }
 
         public async Task<Mark?> GetByName(string name, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-            try
-            {
-                return await db.Marks.Where(c => c.Name == name).AsNoTracking().FirstOrDefaultAsync(token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            return await _context.Marks.Where(c => c.Name == name).AsNoTracking().FirstOrDefaultAsync(token);
         }
 
         public async Task<Mark?> Update(Mark mark, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-            try
-            {
-                var old = await db.Marks.FirstOrDefaultAsync(c => c.Id == mark.Id, token);
-                if (old is null) return null;
+            var old = await _context.Marks.FirstOrDefaultAsync(c => c.Id == mark.Id, token) ?? throw new NotFoundException<Mark>(mark.Id);
 
-                old.Name = mark.Name;
-                await db.SaveChangesAsync(token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            old.Name = mark.Name;
+            await _context.SaveChangesAsync(token);
             return mark;
         }
     }

@@ -32,7 +32,6 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult<UserDTO>> GetUserById(int id)
         {
             var user = await _usersService.GetById(id);
-            if (user is null) return NotFound($"Пользователь {id} не найден");
             return Ok(new { User = user });
         }
 
@@ -48,8 +47,6 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsersByRole(int roleId)
         {
             var users = await _usersService.GetByRole(roleId);
-            if (users is null) return BadRequest($"Роль {roleId} не найдена");
-            if (!users.Any()) return NotFound($"Пользователей с ролью {roleId} не найдено");
             return Ok(new { Users = users });
         }
 
@@ -72,7 +69,6 @@ namespace SibintekTask.API.Controllers
         {
             var dto = new UserDTO() { Name = request.Name, Surname = request.Surname, ITN = request.Itn };
             var updated = await _usersService.Update(dto);
-            if (updated is null) return NotFound($"Пользователь {id} не найден");
             return Ok(new { Updated = updated });
         }
 
@@ -81,7 +77,6 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult> DeleteUser(int id)
         {
             var deleted = await _usersService.Delete(id);
-            if (deleted == 0) return NotFound($"Пользователь {id} не найден");
             return Ok(new { DeletedCount = deleted });
         }
 

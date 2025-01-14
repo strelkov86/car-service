@@ -30,7 +30,6 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult> GetRepairTypeById(int id)
         {
             var type = await _typesService.GetById(id);
-            if (type is null) return NotFound($"Тип ремонта {id} не найден");
             return Ok(new { Type = type });
         }
 
@@ -47,7 +46,6 @@ namespace SibintekTask.API.Controllers
         {
             var typeDto = new RepairTypeDTO() { Id = id, Name = request.Name };
             var updated = await _typesService.Update(typeDto);
-            if (updated is null) return NotFound($"Тип ремонта {id} не найден");
             return Ok(new { Updated = updated });
         }
 
@@ -56,7 +54,6 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult> DeleteRepairType(int id)
         {
             var deleted = await _typesService.Delete(id);
-            if (deleted == 0) return NotFound($"Тип ремонта {id} не найден");
             return Ok(new { DeletedCount = deleted });
         }
     }

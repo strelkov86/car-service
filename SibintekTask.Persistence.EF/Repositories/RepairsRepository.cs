@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using SibintekTask.Core.Exceptions;
 using SibintekTask.Core.Interfaces;
 using SibintekTask.Core.Models;
 using System;
@@ -12,256 +12,154 @@ namespace SibintekTask.Persistence.EF.Repositories
 {
     public class RepairsRepository : IRepairsRepository
     {
-        private readonly IDbContextFactory<SibintekDbContext> _dbContextFactory;
-        private readonly ILogger _logger;
+        private readonly SibintekDbContext _context;
 
-        public RepairsRepository(IDbContextFactory<SibintekDbContext> f, ILogger<RepairsRepository> l)
+        public RepairsRepository(SibintekDbContext c)
         {
-            _dbContextFactory = f;
-            _logger = l;
+            _context = c;
         }
 
         public async Task<Repair> Create(Repair repair, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-            db.Repairs.Add(repair);
+            _context.Repairs.Add(repair);
 
-            try
-            {
-                await db.SaveChangesAsync(token);
-                await LoadRepairReferences(db, repair, token);
-                return repair;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            await _context.SaveChangesAsync(token);
+            await LoadRepairReferences(repair, token);
+            return repair;
         }
 
         public async Task<int> Delete(int id, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-
-            try
-            {
-                var repair = await db.Repairs.FirstOrDefaultAsync(r => r.Id == id, token);
-                if (repair is null) return 0;
-
-                db.Repairs.Remove(repair);
-                return await db.SaveChangesAsync(token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            var repair = await _context.Repairs.FirstOrDefaultAsync(r => r.Id == id, token) ?? throw new NotFoundException<Repair>(id);
+            _context.Repairs.Remove(repair);
+            return await _context.SaveChangesAsync(token);
         }
 
         public async Task<IEnumerable<Repair>?> GetAll(CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-
-            try
-            {
-                return await db.Repairs
-                    .Include(r => r.RepairType)
-                    .Include(r => r.Vehicle)
-                        .ThenInclude(v => v.Mark)
-                    .Include(r => r.Executor)
-                    .Include(r => r.Customer)
-                    .AsNoTracking().ToListAsync(token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            return await _context.Repairs
+                .Include(r => r.RepairType)
+                .Include(r => r.Vehicle)
+                    .ThenInclude(v => v.Mark)
+                .Include(r => r.Executor)
+                .Include(r => r.Customer)
+                .AsNoTracking().ToListAsync(token);
         }
 
         public async Task<Repair?> GetById(int id, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-
-            try
-            {
-                return await db.Repairs.Where(r => r.Id == id)
-                    .Include(r => r.RepairType)
-                    .Include(r => r.Vehicle)
-                        .ThenInclude(v => v.Mark)
-                    .Include(r => r.Executor)
-                    .Include(r => r.Customer)
-                    .AsNoTracking().FirstOrDefaultAsync(token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            return await _context.Repairs.Where(r => r.Id == id)
+                .Include(r => r.RepairType)
+                .Include(r => r.Vehicle)
+                    .ThenInclude(v => v.Mark)
+                .Include(r => r.Executor)
+                .Include(r => r.Customer)
+                .AsNoTracking().FirstOrDefaultAsync(token) ?? throw new NotFoundException<Repair>(id);
         }
 
         public async Task<RepairReport?> GetReportByCustomer(int customerId, DateTime? startDate, DateTime? endDate, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-            try
-            {
-                var repairs = db.Repairs.Where(r => r.CustomerId == customerId).HandlePeriod(startDate, endDate);
-                if (!repairs.Any()) return null;
+            var repairs = _context.Repairs.Where(r => r.CustomerId == customerId).HandlePeriod(startDate, endDate);
+            if (!await repairs.AnyAsync(token)) return null;
 
-                var report = await GetRepairCountAndSum(repairs, token);
-                report.StartDate = startDate;
-                report.EndDate = endDate;
-                return report;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            var report = await GetRepairCountAndSum(repairs, token);
+            report.StartDate = startDate;
+            report.EndDate = endDate;
+            return report;
         }
 
         public async Task<RepairReport?> GetReportByExecutor(int executorId, DateTime? startDate, DateTime? endDate, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-            try
-            {
-                var repairs = db.Repairs.Where(r => r.ExecutorId == executorId).HandlePeriod(startDate, endDate);
-                if (!repairs.Any()) return null;
+            var repairs = _context.Repairs.Where(r => r.ExecutorId == executorId).HandlePeriod(startDate, endDate);
+            if (!repairs.Any()) return null;
 
-                var report = await GetRepairCountAndSum(repairs, token);
-                report.StartDate = startDate;
-                report.EndDate = endDate;
-                return report;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            var report = await GetRepairCountAndSum(repairs, token);
+            report.StartDate = startDate;
+            report.EndDate = endDate;
+            return report;
         }
 
         public async Task<RepairReport?> GetTotalReport(DateTime? startDate, DateTime? endDate, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-            try
-            {
-                var repairs = db.Repairs.HandlePeriod(startDate, endDate);
-                if (!repairs.Any()) return null;
+            var repairs = _context.Repairs.HandlePeriod(startDate, endDate);
+            if (!repairs.Any()) return null;
 
-                var report = await GetRepairCountAndSum(repairs, token);
-                report.StartDate = startDate;
-                report.EndDate = endDate;
-                return report;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            var report = await GetRepairCountAndSum(repairs, token);
+            report.StartDate = startDate;
+            report.EndDate = endDate;
+            return report;
         }
 
         private static async Task<RepairReport?> GetRepairCountAndSum(IQueryable<Repair> repairs, CancellationToken token = default)
         {
-            var repairCount = repairs.CountAsync(token);
-            var repairSum = repairs.SumAsync(r => r.Cost, token);
-            await Task.WhenAll(repairCount, repairSum);
+            var repairCount = await repairs.CountAsync(token);
+            var repairSum = await repairs.SumAsync(r => r.Cost, token);
 
             return new RepairReport
             {
-                RepairCount = repairCount.Result,
-                TotalSumRubles = repairSum.Result
+                RepairCount = repairCount,
+                TotalSumRubles = repairSum
             };
         }
 
         public async Task<VehicleReport?> GetReportByVehicle(int vehicleId, DateTime? startDate, DateTime? endDate, int? userId = null, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
-            try
+            var repairs = _context.Repairs.Where(r => r.VehicleId == vehicleId).HandlePeriod(startDate, endDate);
+
+            if (userId.HasValue) repairs = repairs.Where(r => r.CustomerId == userId.Value);
+
+            if (!await repairs.AnyAsync(token)) return null;
+
+            var repairSum = await repairs.SumAsync(r => r.Cost, token);
+
+            var orderedRepairMileages = await repairs.OrderBy(r => r.AcceptedAt).Select(r => r.Mileage).ToListAsync(token);
+            var miliagePerPeriod = orderedRepairMileages.Any() ? orderedRepairMileages.Last() - orderedRepairMileages.First() : 0;
+
+            return new VehicleReport
             {
-                var repairs = db.Repairs.Where(r => r.VehicleId == vehicleId).HandlePeriod(startDate, endDate);
-
-                if (userId.HasValue) repairs = repairs.Where(r => r.CustomerId == userId.Value);
-
-                if (!await repairs.AnyAsync(token)) return null;
-
-                var repairSum = await repairs.SumAsync(r => r.Cost, token);
-
-                var orderedRepairMileages = await repairs.OrderBy(r => r.AcceptedAt).Select(r => r.Mileage).ToListAsync(token);
-                var miliagePerPeriod = orderedRepairMileages.Any() ? orderedRepairMileages.Last() - orderedRepairMileages.First() : 0;
-
-                return new VehicleReport
-                {
-                    TotalSumRubles = repairSum,
-                    MiliagesPerPeriodInKm = miliagePerPeriod,
-                    StartDate = startDate,
-                    EndDate = endDate
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+                TotalSumRubles = repairSum,
+                MiliagesPerPeriodInKm = miliagePerPeriod,
+                StartDate = startDate,
+                EndDate = endDate
+            };
         }
 
         public async Task<Repair?> Update(Repair repair, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
+            var old = await _context.Repairs.FirstOrDefaultAsync(r => r.Id == repair.Id, token) ?? throw new NotFoundException<Repair>(repair.Id);
 
-            try
-            {
-                var old = await db.Repairs.FirstOrDefaultAsync(r => r.Id == repair.Id, token);
-                if (old is null) return null;
+            old.AcceptedAt = repair.AcceptedAt;
+            old.FinishedAt = repair.FinishedAt;
+            old.Cost = repair.Cost;
+            old.RepairTypeId = repair.RepairTypeId;
+            old.Mileage = repair.Mileage;
+            old.CustomerId = repair.CustomerId;
+            old.ExecutorId = repair.ExecutorId;
+            old.VehicleId = repair.VehicleId;
 
-                old.AcceptedAt = repair.AcceptedAt;
-                old.FinishedAt = repair.FinishedAt;
-                old.Cost = repair.Cost;
-                old.RepairTypeId = repair.RepairTypeId;
-                old.Mileage = repair.Mileage;
-                old.CustomerId = repair.CustomerId;
-                old.ExecutorId = repair.ExecutorId;
-                old.VehicleId = repair.VehicleId;
-
-                await db.SaveChangesAsync(token);
-                await LoadRepairReferences(db, old, token);
-                return old;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            await _context.SaveChangesAsync(token);
+            await LoadRepairReferences(old, token);
+            return old;
         }
 
         public async Task<Repair?> FinishRepair(int id, CancellationToken token = default)
         {
-            await using var db = _dbContextFactory.CreateDbContext();
+            var old = await _context.Repairs.FirstOrDefaultAsync(r => r.Id == id, token) ?? throw new NotFoundException<Repair>(id);
 
-            try
-            {
-                var old = await db.Repairs.FirstOrDefaultAsync(r => r.Id == id, token);
-                if (old is null) return null;
-
-                old.FinishedAt = DateTime.Now;
-                await db.SaveChangesAsync(token);
-                await LoadRepairReferences(db, old, token);
-                return old;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                throw new Exception(ex.Message);
-            }
+            old.FinishedAt = DateTime.Now;
+            await _context.SaveChangesAsync(token);
+            await LoadRepairReferences(old, token);
+            return old;
         }
 
-        private async Task LoadRepairReferences(DbContext db, Repair repair, CancellationToken token = default)
+        private async Task LoadRepairReferences(Repair repair, CancellationToken token = default)
         {
-            var type = db.Entry(repair).Reference(r => r.RepairType).LoadAsync(token);
-            var customer = db.Entry(repair).Reference(r => r.Customer).LoadAsync(token);
-            var executor = db.Entry(repair).Reference(r => r.Executor).LoadAsync(token);
+            var type = _context.Entry(repair).Reference(r => r.RepairType).LoadAsync(token);
+            var customer = _context.Entry(repair).Reference(r => r.Customer).LoadAsync(token);
+            var executor = _context.Entry(repair).Reference(r => r.Executor).LoadAsync(token);
 
-            await db.Entry(repair).Reference(r => r.Vehicle).LoadAsync(token);
-            var mark = db.Entry(repair.Vehicle).Reference(v => v.Mark).LoadAsync(token);
+            await _context.Entry(repair).Reference(r => r.Vehicle).LoadAsync(token);
+            var mark = _context.Entry(repair.Vehicle).Reference(v => v.Mark).LoadAsync(token);
 
             await Task.WhenAll(type, customer, executor, mark);
         }

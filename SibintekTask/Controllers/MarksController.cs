@@ -30,7 +30,6 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult> GetMarkById(int id)
         {
             var mark = await _marksService.GetById(id);
-            if (mark is null) return NotFound($"Марка {id} автомобиля не найдена");
             return Ok(new { Mark = mark });
         }
 
@@ -47,7 +46,6 @@ namespace SibintekTask.API.Controllers
         {
             var markDto = new MarkDTO() { Id = id, Name = request.Name };
             var updated = await _marksService.Update(markDto);
-            if (updated is null) return NotFound($"Марка {id} автомобиля не найдена");
             return Ok(new { Updated = updated });
         }
 
@@ -56,7 +54,6 @@ namespace SibintekTask.API.Controllers
         public async Task<ActionResult> DeleteMark(int id)
         {
             var deleted = await _marksService.Delete(id);
-            if (deleted == 0) return NotFound($"Марка {id} автомобиля не найдена");
             return Ok(new { DeletedCount = deleted });
         }
     }

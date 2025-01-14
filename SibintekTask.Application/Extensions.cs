@@ -12,7 +12,7 @@ namespace SibintekTask.Application
     {
         public static IServiceCollection AddPostgreSQL(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContextFactory<SibintekDbContext>(options =>
+            services.AddDbContext<SibintekDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("LocalPostgreSQL")));
 
             return services;

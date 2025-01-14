@@ -2,6 +2,7 @@
 */obj/
 */.cr
 */.vs/
+*/logs/
 
 /SibintekTask/appsettings.json
 /SibintekTask/appsettings.Development.json

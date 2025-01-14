@@ -39,32 +39,32 @@ namespace SibintekTask.Persistence.EF.Repositories
             return await _context.Vehicles.Include(v => v.Mark).AsNoTracking().ToListAsync(token);
         }
 
-        public async Task<Vehicle?> GetById(int id, CancellationToken token = default)
+        public async Task<Vehicle> GetById(int id, CancellationToken token = default)
         {
             return await _context.Vehicles
                 .Include(v => v.Mark)
                 .Where(c => c.Id == id)
-                .AsNoTracking().FirstOrDefaultAsync(token) ?? throw new NotFoundException<Vehicle>(id); ;
+                .AsNoTracking().FirstOrDefaultAsync(token) ?? throw new NotFoundException<Vehicle>(id);
         }
 
-        public async Task<Vehicle?> GetByNumberPlate(string numberPlate, CancellationToken token = default)
+        public async Task<Vehicle> GetByNumberPlate(string numberPlate, CancellationToken token = default)
         {
             return await _context.Vehicles
                 .Include(v => v.Mark)
                 .Where(c => c.NumberPlate!.ToLower().Contains(numberPlate.ToLower()))
-                .AsNoTracking().FirstOrDefaultAsync(token);
+                .AsNoTracking().FirstOrDefaultAsync(token) ?? throw new NotFoundException<Vehicle>();
         }
 
-        public async Task<Vehicle?> GetByPlateAndMark(string numberPlate, int markId, CancellationToken token = default)
+        public async Task<Vehicle> GetByPlateAndMark(string numberPlate, int markId, CancellationToken token = default)
         {
             return await _context.Vehicles
                 .Include(v => v.Mark)
                 .Where(c => c.NumberPlate!.ToLower().Contains(numberPlate.ToLower()))
                 .AsNoTracking()
-                .FirstOrDefaultAsync(v => v.NumberPlate == numberPlate && v.MarkId == markId, token);
+                .FirstOrDefaultAsync(v => v.NumberPlate == numberPlate && v.MarkId == markId, token) ?? throw new NotFoundException<Vehicle>();
         }
 
-        public async Task<Vehicle?> Update(Vehicle vehicle, CancellationToken token = default)
+        public async Task<Vehicle> Update(Vehicle vehicle, CancellationToken token = default)
         {
             var old = await _context.Vehicles.FirstOrDefaultAsync(c => c.Id == vehicle.Id, token) ?? throw new NotFoundException<Vehicle>(vehicle.Id);
 

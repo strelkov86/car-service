@@ -39,23 +39,23 @@ namespace SibintekTask.Application.Services
             return _mapper.Map<IEnumerable<VehicleDTO>>(vehicles);
         }
 
-        public async Task<VehicleDTO?> GetById(int id)
+        public async Task<VehicleDTO> GetById(int id)
         {
             var vehicle = await _vehicles.GetById(id);
-            return _mapper.Map<VehicleDTO?>(vehicle);
+            return _mapper.Map<VehicleDTO>(vehicle);
         }
 
-        public async Task<VehicleDTO?> GetByNumberPlate(string numberPlate)
+        public async Task<VehicleDTO> GetByNumberPlate(string numberPlate)
         {
             var vehicle = await _vehicles.GetByNumberPlate(numberPlate);
-            return _mapper.Map<VehicleDTO?>(vehicle);
+            return _mapper.Map<VehicleDTO>(vehicle);
         }
 
-        public async Task<VehicleDTO?> Update(VehicleDTO vehicleDto)
+        public async Task<VehicleDTO> Update(VehicleDTO vehicleDto)
         {
             var model = _mapper.Map<Vehicle>(vehicleDto);
             var vehicle = await _vehicles.Update(model);
-            return _mapper.Map<VehicleDTO?>(vehicle);
+            return _mapper.Map<VehicleDTO>(vehicle);
         }
     }
 }

@@ -40,17 +40,17 @@ namespace SibintekTask.Persistence.EF.Repositories
             return await _context.RepairTypes.AsNoTracking().ToListAsync(token);
         }
 
-        public async Task<RepairType?> GetById(int id, CancellationToken token = default)
+        public async Task<RepairType> GetById(int id, CancellationToken token = default)
         {
             return await _context.RepairTypes.Where(c => c.Id == id).AsNoTracking().FirstOrDefaultAsync(token) ?? throw new NotFoundException<RepairType>(id);
         }
 
-        public async Task<RepairType?> GetByName(string name, CancellationToken token = default)
+        public async Task<RepairType> GetByName(string name, CancellationToken token = default)
         {
             return await _context.RepairTypes.Where(c => c.Name == name).AsNoTracking().FirstOrDefaultAsync(token);
         }
 
-        public async Task<RepairType?> Update(RepairType type, CancellationToken token = default)
+        public async Task<RepairType> Update(RepairType type, CancellationToken token = default)
         {
             var old = await _context.RepairTypes.FirstOrDefaultAsync(c => c.Id == type.Id, token) ?? throw new NotFoundException<RepairType>(type.Id);
             old.Name = type.Name;

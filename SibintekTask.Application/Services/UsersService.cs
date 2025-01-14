@@ -57,16 +57,16 @@ namespace SibintekTask.Application.Services
             return _mapper.Map<IEnumerable<UserDTO>>(users);
         }
 
-        public async Task<UserDTO?> GetById(int id)
+        public async Task<UserDTO> GetById(int id)
         {
             var user = await _users.GetById(id);
-            return _mapper.Map<UserDTO?>(user);
+            return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<UserDTO?> GetByITN(string itn)
+        public async Task<UserDTO> GetByITN(string itn)
         {
             var user = await _users.GetByITN(itn);
-            return _mapper.Map<UserDTO?>(user);
+            return _mapper.Map<UserDTO>(user);
         }
 
         public async Task<IEnumerable<UserDTO>?> GetByRole(int roleId)
@@ -82,7 +82,7 @@ namespace SibintekTask.Application.Services
             return await _users.RemoveRoleFromUser(userId, roleId);
         }
 
-        public async Task<UserDTO?> Update(UserDTO userDto)
+        public async Task<UserDTO> Update(UserDTO userDto)
         {
             var model = _mapper.Map<User>(userDto);
             var user = await _users.Update(model);

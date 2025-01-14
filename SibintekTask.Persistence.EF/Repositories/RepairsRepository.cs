@@ -46,7 +46,7 @@ namespace SibintekTask.Persistence.EF.Repositories
                 .AsNoTracking().ToListAsync(token);
         }
 
-        public async Task<Repair?> GetById(int id, CancellationToken token = default)
+        public async Task<Repair> GetById(int id, CancellationToken token = default)
         {
             return await _context.Repairs.Where(r => r.Id == id)
                 .Include(r => r.RepairType)
@@ -90,7 +90,7 @@ namespace SibintekTask.Persistence.EF.Repositories
             return report;
         }
 
-        private static async Task<RepairReport?> GetRepairCountAndSum(IQueryable<Repair> repairs, CancellationToken token = default)
+        private static async Task<RepairReport> GetRepairCountAndSum(IQueryable<Repair> repairs, CancellationToken token = default)
         {
             var repairCount = await repairs.CountAsync(token);
             var repairSum = await repairs.SumAsync(r => r.Cost, token);
@@ -124,7 +124,7 @@ namespace SibintekTask.Persistence.EF.Repositories
             };
         }
 
-        public async Task<Repair?> Update(Repair repair, CancellationToken token = default)
+        public async Task<Repair> Update(Repair repair, CancellationToken token = default)
         {
             var old = await _context.Repairs.FirstOrDefaultAsync(r => r.Id == repair.Id, token) ?? throw new NotFoundException<Repair>(repair.Id);
 
@@ -142,7 +142,7 @@ namespace SibintekTask.Persistence.EF.Repositories
             return old;
         }
 
-        public async Task<Repair?> FinishRepair(int id, CancellationToken token = default)
+        public async Task<Repair> FinishRepair(int id, CancellationToken token = default)
         {
             var old = await _context.Repairs.FirstOrDefaultAsync(r => r.Id == id, token) ?? throw new NotFoundException<Repair>(id);
 

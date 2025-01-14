@@ -37,17 +37,17 @@ namespace SibintekTask.Persistence.EF.Repositories
             return await _context.Marks.AsNoTracking().ToListAsync(token);
         }
 
-        public async Task<Mark?> GetById(int id, CancellationToken token = default)
+        public async Task<Mark> GetById(int id, CancellationToken token = default)
         {
             return await _context.Marks.Where(c => c.Id == id).AsNoTracking().FirstOrDefaultAsync(token) ?? throw new NotFoundException<Mark>(id);
         }
 
-        public async Task<Mark?> GetByName(string name, CancellationToken token = default)
+        public async Task<Mark> GetByName(string name, CancellationToken token = default)
         {
-            return await _context.Marks.Where(c => c.Name == name).AsNoTracking().FirstOrDefaultAsync(token);
+            return await _context.Marks.Where(c => c.Name == name).AsNoTracking().FirstOrDefaultAsync(token) ?? throw new NotFoundException<Mark>();
         }
 
-        public async Task<Mark?> Update(Mark mark, CancellationToken token = default)
+        public async Task<Mark> Update(Mark mark, CancellationToken token = default)
         {
             var old = await _context.Marks.FirstOrDefaultAsync(c => c.Id == mark.Id, token) ?? throw new NotFoundException<Mark>(mark.Id);
 

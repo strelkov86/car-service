@@ -53,14 +53,14 @@ namespace SibintekTask.Persistence.EF.Repositories
             return await _context.Users.Include(u => u.Roles).AsNoTracking().ToListAsync(token);
         }
 
-        public async Task<User?> GetById(int id, CancellationToken token = default)
+        public async Task<User> GetById(int id, CancellationToken token = default)
         {
             return await _context.Users.Include(u => u.Roles).Where(c => c.Id == id).AsNoTracking().FirstOrDefaultAsync(token) ?? throw new NotFoundException<User>(id);
         }
 
-        public async Task<User?> GetByITN(string itn, CancellationToken token = default)
+        public async Task<User> GetByITN(string itn, CancellationToken token = default)
         {
-            return await _context.Users.Include(u => u.Roles).Where(c => c.ITN.Contains(itn)).AsNoTracking().FirstOrDefaultAsync(token);
+            return await _context.Users.Include(u => u.Roles).Where(c => c.ITN.Contains(itn)).AsNoTracking().FirstOrDefaultAsync(token) ?? throw new NotFoundException<User>();
         }
 
         public async Task<IEnumerable<User>?> GetByRole(int roleId, CancellationToken token = default)
@@ -94,7 +94,7 @@ namespace SibintekTask.Persistence.EF.Repositories
             return old;
         }
 
-        public async Task<User?> Update(User user, CancellationToken token = default)
+        public async Task<User> Update(User user, CancellationToken token = default)
         {
             var old = await _context.Users.FirstOrDefaultAsync(c => c.Id == user.Id, token) ?? throw new NotFoundException<User>(user.Id);
 

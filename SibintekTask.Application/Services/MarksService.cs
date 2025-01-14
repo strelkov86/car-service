@@ -41,17 +41,17 @@ namespace SibintekTask.Application.Services
             return _mapper.Map<IEnumerable<MarkDTO>>(marks);
         }
 
-        public async Task<MarkDTO?> GetById(int id)
+        public async Task<MarkDTO> GetById(int id)
         {
             var mark = await _marks.GetById(id);
-            return _mapper.Map<MarkDTO?>(mark);
+            return _mapper.Map<MarkDTO>(mark);
         }
 
-        public async Task<MarkDTO?> Update(MarkDTO dto)
+        public async Task<MarkDTO> Update(MarkDTO dto)
         {
             var model = _mapper.Map<Mark>(dto);
             var mark = await _marks.Update(model);
-            return _mapper.Map<MarkDTO?>(mark);
+            return _mapper.Map<MarkDTO>(mark);
         }
     }
 }

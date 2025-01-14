@@ -42,17 +42,17 @@ namespace SibintekTask.Application.Services
             return _mapper.Map<IEnumerable<RoleDTO>>(roles);
         }
 
-        public async Task<RoleDTO?> GetById(int id)
+        public async Task<RoleDTO> GetById(int id)
         {
             var role = await _roles.GetById(id);
-            return _mapper.Map<RoleDTO?>(role);
+            return _mapper.Map<RoleDTO>(role);
         }
 
-        public async Task<RoleDTO?> Update(RoleDTO dto)
+        public async Task<RoleDTO> Update(RoleDTO dto)
         {
             var model = _mapper.Map<Role>(dto);
             var role = await _roles.Update(model);
-            return _mapper.Map<RoleDTO?>(role);
+            return _mapper.Map<RoleDTO>(role);
         }
     }
 }

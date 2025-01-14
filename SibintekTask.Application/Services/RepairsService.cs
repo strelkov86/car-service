@@ -33,11 +33,11 @@ namespace SibintekTask.Application.Services
             return await _repairs.Delete(id);
         }
 
-        public async Task<IEnumerable<RepairDTO>?> GetAll()
+        public async Task<IEnumerable<RepairDTO>> GetAll()
         {
             var repairs = await _repairs.GetAll();
             if (!repairs.Any()) return null;
-            return _mapper.Map<IEnumerable<RepairDTO>?>(repairs);
+            return _mapper.Map<IEnumerable<RepairDTO>>(repairs);
         }
 
         public async Task<RepairDTO?> GetById(int id)
@@ -46,14 +46,14 @@ namespace SibintekTask.Application.Services
             return _mapper.Map<RepairDTO>(repair);
         }
 
-        public async Task<RepairDTO?> Update(RepairDTO dto)
+        public async Task<RepairDTO> Update(RepairDTO dto)
         {
             var model = _mapper.Map<Repair>(dto);
             var repair = await _repairs.Update(model);
-            return _mapper.Map<RepairDTO?>(repair);
+            return _mapper.Map<RepairDTO>(repair);
         }
 
-        public async Task<RepairDTO?> FinishRepair(int id)
+        public async Task<RepairDTO> FinishRepair(int id)
         {
             var repair = await _repairs.FinishRepair(id);
             return _mapper.Map<RepairDTO>(repair);

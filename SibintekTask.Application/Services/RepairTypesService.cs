@@ -41,17 +41,17 @@ namespace SibintekTask.Application.Services
             return _mapper.Map<IEnumerable<RepairTypeDTO>>(types);
         }
 
-        public async Task<RepairTypeDTO?> GetById(int id)
+        public async Task<RepairTypeDTO> GetById(int id)
         {
             var type = await _types.GetById(id);
-            return _mapper.Map<RepairTypeDTO?>(type);
+            return _mapper.Map<RepairTypeDTO>(type);
         }
 
-        public async Task<RepairTypeDTO?> Update(RepairTypeDTO dto)
+        public async Task<RepairTypeDTO> Update(RepairTypeDTO dto)
         {
             var model = _mapper.Map<RepairType>(dto);
             var type = await _types.Update(model);
-            return _mapper.Map<RepairTypeDTO?>(type);
+            return _mapper.Map<RepairTypeDTO>(type);
         }
     }
 }
